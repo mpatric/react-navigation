@@ -3,6 +3,7 @@
 
 import React from 'react';
 import TabRouter from '../TabRouter';
+import StackRouter from "../StackRouter"
 
 import NavigationActions from '../../NavigationActions';
 
@@ -594,4 +595,53 @@ describe('TabRouter', () => {
       ],
     });
   });
+
+  test('Inner actions are only unpacked if the current tab matches', () => {
+    const PlainScreen = () => <div />;
+    const ScreenA = () => <div />;
+    const ScreenB = () => <div />;
+    ScreenB.router = StackRouter({
+      Baz: { screen: PlainScreen },
+      Zoo: { screen: PlainScreen },
+    })
+    ScreenA.router = StackRouter({
+      Bar: { screen: PlainScreen },
+      Boo: { screen: ScreenB }
+    });
+    const router = TabRouter({
+      Foo: { screen: ScreenA },
+    });
+    const screenApreState = {
+      index: 0,
+      key: 'Init',
+      routeName: 'Foo',
+      routes: [
+        { key: 'Init', routeName: 'Bar' },
+      ],
+    };
+    const preState = {
+      index: 0,
+      routes: [
+        screenApreState,
+      ],
+    };
+
+    const comparable = (state) => {
+      if(state) {
+        return {routeName: state.routeName,
+                ...(state.routes ?
+                    {routes: state.routes.map(comparable)} :
+                    null)}
+      }
+      return state
+    }
+
+    const action = NavigationActions.navigate({routeName: 'Boo', action: NavigationActions.navigate({routeName: 'Zoo'})});
+
+    const expectedState = ScreenA.router.getStateForAction(action, screenApreState);
+    const state = router.getStateForAction(action, preState);
+    const innerState = state ? state.routes[0] : state;
+
+    expect(comparable(expectedState)).toEqual(comparable(innerState));
+  })
 });
