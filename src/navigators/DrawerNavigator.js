@@ -45,6 +45,7 @@ const DrawerNavigator = (
     contentComponent,
     contentOptions,
     drawerPosition,
+    onDrawerSlide,
     ...tabsConfig
   } = mergedConfig;
 
@@ -81,6 +82,7 @@ const DrawerNavigator = (
       contentComponent={contentComponent}
       contentOptions={contentOptions}
       drawerPosition={drawerPosition}
+      onDrawerSlide={onDrawerSlide}
     />
   );
 
