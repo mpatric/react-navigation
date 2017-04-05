@@ -120,6 +120,7 @@ export default class DrawerView<T: *> extends PureComponent<void, Props, void> {
         drawerWidth={this.props.drawerWidth}
         onDrawerOpen={this._handleDrawerOpen}
         onDrawerClose={this._handleDrawerClose}
+        onDrawerSlide={this.props.onDrawerSlide}
         renderNavigationView={this._renderNavigationView}
         drawerPosition={
           this.props.drawerPosition === 'right' ?
