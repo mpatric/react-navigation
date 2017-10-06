@@ -1,6 +1,7 @@
 /* @flow */
 
 import React, { PureComponent } from 'react';
+import { View } from 'react-native';
 import DrawerLayout from 'react-native-drawer-layout-polyfill';
 
 import addNavigationHelpers from '../../addNavigationHelpers';
@@ -45,6 +46,12 @@ type Props = DrawerViewConfig & {
   >,
   navigation: NavigationScreenProp<NavigationState, NavigationAction>,
 };
+
+const splitScreenPropsAndWrapperStyle = (props) => {
+  const { screenProps = {} } = props
+  const { wrapperStyle, ...otherScreenProps } = screenProps
+  return {wrapperStyle, screenProps: otherScreenProps}
+}
 
 /**
  * Component that renders the drawer.
@@ -117,7 +124,7 @@ export default class DrawerView<T: *> extends PureComponent<void, Props, void> {
 
   _renderNavigationView = () =>
     <DrawerSidebar
-      screenProps={this.props.screenProps}
+      screenProps={splitScreenPropsAndWrapperStyle(this.props).screenProps}
       navigation={this._screenNavigationProp}
       router={this.props.router}
       contentComponent={this.props.contentComponent}
@@ -131,6 +138,7 @@ export default class DrawerView<T: *> extends PureComponent<void, Props, void> {
     const DrawerScreen = this.props.router.getComponentForRouteName(
       'DrawerClose'
     );
+    const { screenProps, wrapperStyle } = splitScreenPropsAndWrapperStyle(this.props)
     return (
       <DrawerLayout
         ref={(c: *) => {
@@ -147,10 +155,12 @@ export default class DrawerView<T: *> extends PureComponent<void, Props, void> {
             : DrawerLayout.positions.Left
         }
       >
-        <DrawerScreen
-          screenProps={this.props.screenProps}
-          navigation={this._screenNavigationProp}
-        />
+        <View style={{flex: 1, ...wrapperStyle}}>
+          <DrawerScreen
+            screenProps={screenProps}
+            navigation={this._screenNavigationProp}
+          />
+        </View>
       </DrawerLayout>
     );
   }
